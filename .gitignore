@@ -1,0 +1,26 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.env
+.env.local
+
+# Laravel
+/vendor/
+/public/storage
+/storage/*.key
+/storage/app/*
+!/storage/app/public
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+

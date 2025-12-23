@@ -1,0 +1,13 @@
+{
+  "name": "portfolio-site",
+  "version": "1.0.0",
+  "description": "Professional Engineer Portfolio Site",
+  "scripts": {
+    "sass": "sass styles/main.scss styles/main.css --watch",
+    "sass:build": "sass styles/main.scss styles/main.css --style compressed",
+    "dev": "sass styles/main.scss styles/main.css --watch"
+  },
+  "devDependencies": {
+    "sass": "^1.77.0"
+  }
+}
