@@ -34,7 +34,11 @@ git push -u origin main
 
 1. Railwayダッシュボードで「+ New」をクリック
 2. 「Database」→「Add MySQL」または「Add PostgreSQL」を選択
-3. データベースが作成されたら、接続情報をコピー
+3. データベースが作成されたら、接続情報を確認：
+   - データベースサービスをクリック
+   - 「Variables」タブを開く
+   - 接続情報が自動生成されています（`MYSQLHOST`, `MYSQLDATABASE`など）
+   - 詳細は `RAILWAY_DATABASE.md` を参照
 
 ### 4. 環境変数の設定
 
@@ -67,17 +71,35 @@ ADMIN_PASSWORD=your_secure_password_here
 - `PORT` - アプリケーションのポート番号（自動）
 - `RAILWAY_ENVIRONMENT` - 環境名（自動）
 
-#### データベース接続情報の取得方法
+#### データベース接続情報の設定方法
 
-1. Railwayダッシュボードでデータベースサービスをクリック
-2. 「Variables」タブで以下の変数が自動生成されています：
-   - `MYSQLHOST` または `PGHOST`
-   - `MYSQLPORT` または `PGPORT`
-   - `MYSQLDATABASE` または `PGDATABASE`
-   - `MYSQLUSER` または `PGUSER`
-   - `MYSQLPASSWORD` または `PGPASSWORD`
+**方法1: Railway自動変数参照を使用（推奨）**
 
-これらの変数を`.env`形式に変換して設定します。
+アプリケーションサービスの「Variables」タブで、以下のように設定：
+
+```
+DB_CONNECTION=mysql
+DB_HOST=${{MySQL.MYSQLHOST}}
+DB_PORT=${{MySQL.MYSQLPORT}}
+DB_DATABASE=${{MySQL.MYSQLDATABASE}}
+DB_USERNAME=${{MySQL.MYSQLUSER}}
+DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+```
+
+**方法2: 手動で値を設定**
+
+データベースサービスの「Variables」タブで値を確認し、手動で設定：
+
+```
+DB_CONNECTION=mysql
+DB_HOST=mysql.railway.internal
+DB_PORT=3306
+DB_DATABASE=railway
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
+
+詳細は `RAILWAY_ENV_VARS.md` を参照してください。
 
 ### 5. ビルド設定の確認
 

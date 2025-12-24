@@ -8,3 +8,6 @@ healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
 
+# 注意: 環境変数はRailwayダッシュボードの「Variables」タブで設定してください
+# このファイルには環境変数を記載しないでください
+
