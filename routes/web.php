@@ -6,6 +6,11 @@ use App\Http\Controllers\Admin\AdminHeroStatController;
 use App\Http\Controllers\Admin\AdminServiceController;
 use Illuminate\Support\Facades\Route;
 
+// Health check endpoint (no database required)
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok', 'timestamp' => now()], 200);
+});
+
 // Frontend routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
