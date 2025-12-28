@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Liberaspace - 静的サイト制作からWEBアプリ開発まで、幅広いWeb制作サービスを提供">
   <title>Liberaspace | Web制作・開発サービス</title>
-  <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+  <link rel="stylesheet" href="/css/main.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -74,7 +74,7 @@
     </div>
   </footer>
 
-  <script src="{{ asset('js/main.js') }}"></script>
+  <script src="/js/main.js"></script>
 </body>
 </html>
 
