@@ -10,7 +10,12 @@ class AdminServiceController extends Controller
 {
     public function index()
     {
-        $services = Service::orderBy('display_order')->get();
+        try {
+            $services = Service::orderBy('display_order')->get();
+        } catch (\Exception $e) {
+            // Database connection error - use empty collection
+            $services = collect();
+        }
         return view('admin.services.index', compact('services'));
     }
 

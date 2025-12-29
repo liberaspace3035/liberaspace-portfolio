@@ -10,7 +10,12 @@ class AdminHeroStatController extends Controller
 {
     public function index()
     {
-        $stats = HeroStat::orderBy('display_order')->get();
+        try {
+            $stats = HeroStat::orderBy('display_order')->get();
+        } catch (\Exception $e) {
+            // Database connection error - use empty collection
+            $stats = collect();
+        }
         return view('admin.hero-stats.index', compact('stats'));
     }
 

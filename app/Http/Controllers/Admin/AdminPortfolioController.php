@@ -48,9 +48,16 @@ class AdminPortfolioController extends Controller
      */
     public function dashboard()
     {
-        $portfolios = Portfolio::orderBy('display_order')->orderBy('created_at', 'desc')->get();
-        $heroStats = \App\Models\HeroStat::orderBy('display_order')->get();
-        $services = \App\Models\Service::orderBy('display_order')->get();
+        try {
+            $portfolios = Portfolio::orderBy('display_order')->orderBy('created_at', 'desc')->get();
+            $heroStats = \App\Models\HeroStat::orderBy('display_order')->get();
+            $services = \App\Models\Service::orderBy('display_order')->get();
+        } catch (\Exception $e) {
+            // Database connection error - use empty collections
+            $portfolios = collect();
+            $heroStats = collect();
+            $services = collect();
+        }
         return view('admin.dashboard', compact('portfolios', 'heroStats', 'services'));
     }
 
@@ -59,7 +66,12 @@ class AdminPortfolioController extends Controller
      */
     public function index()
     {
-        $portfolios = Portfolio::orderBy('display_order')->orderBy('created_at', 'desc')->get();
+        try {
+            $portfolios = Portfolio::orderBy('display_order')->orderBy('created_at', 'desc')->get();
+        } catch (\Exception $e) {
+            // Database connection error - use empty collection
+            $portfolios = collect();
+        }
         return view('admin.portfolios.index', compact('portfolios'));
     }
 
