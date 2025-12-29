@@ -96,7 +96,7 @@ npm run dev
 
 ## Railwayへのデプロイ
 
-詳細なデプロイ手順は [`RAILWAY_GUIDE.md`](./RAILWAY_GUIDE.md) を参照してください。
+詳細なデプロイ手順は [`DEPLOY.md`](./DEPLOY.md) を参照してください。
 
 ## プロジェクト構造
 
@@ -149,7 +149,11 @@ mycompany/
 
 ## トラブルシューティング
 
-### 画像が表示されない
+詳細なトラブルシューティングガイドは [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) を参照してください。
+
+### よくある問題
+
+#### 画像が表示されない
 
 ```bash
 php artisan storage:link
@@ -157,11 +161,11 @@ php artisan storage:link
 
 を実行して、ストレージリンクが正しく作成されているか確認してください。
 
-### データベースエラー
+#### データベースエラー
 
 `.env`ファイルのデータベース設定を確認し、データベースが作成されているか確認してください。
 
-### パーミッションエラー
+#### パーミッションエラー
 
 `storage`と`bootstrap/cache`ディレクトリに書き込み権限があるか確認してください：
 
@@ -171,7 +175,7 @@ chmod -R 775 storage bootstrap/cache
 
 ## Railwayへのデプロイ
 
-このアプリケーションをRailwayにデプロイする手順は、[DEPLOY.md](./DEPLOY.md)を参照してください。
+このアプリケーションをRailwayにデプロイする手順は、[`DEPLOY.md`](./DEPLOY.md)を参照してください。
 
 ### クイックスタート
 
@@ -181,7 +185,7 @@ chmod -R 775 storage bootstrap/cache
 4. 環境変数を設定（`DEPLOY.md`を参照）
 5. デプロイが自動的に開始されます
 
-詳細な手順は `DEPLOY.md` を参照してください。
+詳細な手順は [`DEPLOY.md`](./DEPLOY.md) を参照してください。
 
 ## ライセンス
 

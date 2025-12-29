@@ -1,258 +1,202 @@
-# Railway デプロイ手順
+# Railway デプロイガイド
 
 このドキュメントでは、LiberaspaceポートフォリオサイトをRailwayにデプロイする手順を説明します。
 
-## 前提条件
+## 目次
 
-- Railwayアカウント（https://railway.app/ で無料登録可能）
-- GitHubアカウント（推奨）またはGitリポジトリ
+1. [初回デプロイ手順](#初回デプロイ手順)
+2. [環境変数の設定](#環境変数の設定)
+3. [データベースの設定](#データベースの設定)
+4. [よくある問題と解決方法](#よくある問題と解決方法)
 
-## デプロイ手順
+---
 
-### 1. GitHubリポジトリの作成（推奨）
+## 初回デプロイ手順
 
-```bash
-# Gitリポジトリを初期化（まだの場合）
-git init
-git add .
-git commit -m "Initial commit"
-
-# GitHubにリポジトリを作成し、プッシュ
-git remote add origin https://github.com/yourusername/liberaspace.git
-git push -u origin main
-```
-
-### 2. Railwayプロジェクトの作成
+### 1. Railwayプロジェクトの作成
 
 1. [Railway](https://railway.app/) にアクセスしてログイン
 2. 「New Project」をクリック
-3. 「Deploy from GitHub repo」を選択（GitHubを使用する場合）
-   - または「Empty Project」を選択して後でGitリポジトリを接続
-4. リポジトリを選択して接続
+3. 「Deploy from GitHub repo」を選択
+4. GitHubリポジトリを選択して接続
 
-### 3. データベースの追加
+### 2. データベースサービスの追加
 
-1. Railwayダッシュボードで「+ New」をクリック
-2. 「Database」→「Add MySQL」または「Add PostgreSQL」を選択
-3. データベースが作成されたら、接続情報を確認：
-   - データベースサービスをクリック
-   - 「Variables」タブを開く
-   - 接続情報が自動生成されています（`MYSQLHOST`, `MYSQLDATABASE`など）
-   - 詳細は `RAILWAY_DATABASE.md` を参照
+1. プロジェクト内で「+ New」をクリック
+2. 「Database」→「Add MySQL」を選択
+3. データベースサービスが作成されるまで待つ
 
-### 4. 環境変数の設定
+### 3. 環境変数の設定
 
-Railwayダッシュボードの「Variables」タブで以下の環境変数を設定：
+アプリケーションサービスの「Variables」タブで、以下の環境変数を**1つずつ**設定してください。
 
-#### 必須の環境変数
+---
 
-```
-APP_NAME=Liberaspace
-APP_ENV=production
-APP_KEY=                    # 後で生成（手順5を参照）
-APP_DEBUG=false
-APP_URL=                    # Railwayが自動生成するURL（後で設定）
-APP_TIMEZONE=Asia/Tokyo
+## 環境変数の設定
 
-DB_CONNECTION=mysql          # または pgsql
-DB_HOST=                    # Railwayデータベースのホスト
-DB_PORT=3306                # MySQLの場合、PostgreSQLの場合は5432
-DB_DATABASE=                # Railwayデータベース名
-DB_USERNAME=                # Railwayデータベースユーザー名
-DB_PASSWORD=                # Railwayデータベースパスワード
+### 重要な注意事項
 
-ADMIN_PASSWORD=your_secure_password_here
-```
+**`.env`ファイルはGitにコミットされません**。本番環境の環境変数は、Railwayダッシュボードの「Variables」タブで**手動で設定**する必要があります。
 
-**重要**: `APP_KEY`は最初のデプロイ後に生成する必要があります（手順7を参照）。
+### 必須環境変数
 
-#### Railwayが自動設定する変数
+#### アプリケーション設定
 
-- `PORT` - アプリケーションのポート番号（自動）
-- `RAILWAY_ENVIRONMENT` - 環境名（自動）
+| 変数名 | 値 | 説明 |
+|--------|-----|------|
+| `APP_NAME` | `Liberaspace` | アプリケーション名 |
+| `APP_ENV` | `production` | 環境（本番環境） |
+| `APP_KEY` | `base64:...` | 暗号化キー（後で生成） |
+| `APP_DEBUG` | `false` | デバッグモード（本番ではfalse） |
+| `APP_URL` | `https://your-app.railway.app` | アプリケーションのURL |
+| `APP_TIMEZONE` | `Asia/Tokyo` | タイムゾーン |
 
-#### データベース接続情報の設定方法
+#### データベース接続設定
 
-**方法1: Railway自動変数参照を使用（推奨）**
+データベースサービスの「Variables」タブで確認した値を設定：
 
-アプリケーションサービスの「Variables」タブで、以下のように設定：
+| 変数名 | 値の取得元 | 説明 |
+|--------|-----------|------|
+| `DB_CONNECTION` | - | `mysql` |
+| `DB_HOST` | データベースサービスの`MYSQLHOST` | データベースホスト |
+| `DB_PORT` | データベースサービスの`MYSQLPORT` | データベースポート（通常3306） |
+| `DB_DATABASE` | データベースサービスの`MYSQLDATABASE` | データベース名 |
+| `DB_USERNAME` | データベースサービスの`MYSQLUSER` | データベースユーザー名 |
+| `DB_PASSWORD` | データベースサービスの`MYSQLPASSWORD` | データベースパスワード |
 
-```
-DB_CONNECTION=mysql
-DB_HOST=${{MySQL.MYSQLHOST}}
-DB_PORT=${{MySQL.MYSQLPORT}}
-DB_DATABASE=${{MySQL.MYSQLDATABASE}}
-DB_USERNAME=${{MySQL.MYSQLUSER}}
-DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
-```
+#### キャッシュ・セッション設定
 
-**方法2: 手動で値を設定**
+| 変数名 | 値 | 説明 |
+|--------|-----|------|
+| `CACHE_STORE` | `file` | キャッシュドライバー（データベース接続不要） |
+| `SESSION_DRIVER` | `file` | セッションドライバー（データベース接続不要） |
 
-データベースサービスの「Variables」タブで値を確認し、手動で設定：
+#### 管理画面設定
 
-```
-DB_CONNECTION=mysql
-DB_HOST=mysql.railway.internal
-DB_PORT=3306
-DB_DATABASE=railway
-DB_USERNAME=root
-DB_PASSWORD=your_password
-```
+| 変数名 | 値 | 説明 |
+|--------|-----|------|
+| `ADMIN_PASSWORD` | 任意のパスワード | 管理画面のログインパスワード |
 
-詳細は `RAILWAY_ENV_VARS.md` を参照してください。
+### 環境変数の設定手順
 
-### 5. ビルド設定の確認
+1. Railwayダッシュボードでアプリケーションサービスを開く
+2. 「Variables」タブを開く
+3. 「+ New Variable」をクリック
+4. **Variable**欄に環境変数名を入力
+5. **Value**欄に値を入力
+6. 「Add」をクリック
+7. すべての環境変数を1つずつ設定
 
-Railwayは自動的に以下のファイルを検出します：
-- `railway.json` - Railway設定ファイル
-- `Procfile` - 起動コマンド
-- `nixpacks.toml` - Nixpacks設定（オプション）
+### APP_KEYの生成
 
-### 6. デプロイの実行
+`APP_KEY`は最初のデプロイ後に生成する必要があります：
 
-1. Railwayダッシュボードで「Deploy」をクリック
-2. ビルドとデプロイが自動的に開始されます
-3. ログを確認してエラーがないか確認
-
-### 7. APP_KEYの生成
-
-最初のデプロイ後、`APP_KEY`を生成する必要があります：
-
-#### Railway CLIを使用する場合
-
-```bash
-railway run php artisan key:generate --show
-```
-
-出力されたキーをコピーして、Railwayダッシュボードの「Variables」で`APP_KEY`に設定します。
-
-#### Railwayダッシュボードから実行する場合
-
-1. サービスをクリック
-2. 「Deployments」タブを開く
-3. 最新のデプロイメントをクリック
-4. 「View Logs」でターミナルにアクセス
-5. 以下のコマンドを実行：
+1. Railwayダッシュボードでアプリケーションサービスのターミナルを開く
+2. 以下のコマンドを実行：
 
 ```bash
 php artisan key:generate --show
 ```
 
-出力されたキーをコピーして、Railwayダッシュボードの「Variables」で`APP_KEY`に設定します。
+3. 出力されたキー（`base64:...`で始まる）をコピー
+4. 「Variables」タブで`APP_KEY`に設定
 
-### 8. デプロイ後の設定
+---
 
-デプロイが完了し、`APP_KEY`を設定したら、以下のコマンドを実行する必要があります：
+## データベースの設定
 
-#### Railway CLIを使用する場合
+### データベース接続情報の確認
 
-```bash
-# Railway CLIをインストール
-npm i -g @railway/cli
+1. Railwayダッシュボードでデータベースサービスを開く
+2. 「Variables」タブで以下を確認：
+   - `MYSQLHOST` → `DB_HOST`に設定
+   - `MYSQLPORT` → `DB_PORT`に設定
+   - `MYSQLDATABASE` → `DB_DATABASE`に設定
+   - `MYSQLUSER` → `DB_USERNAME`に設定
+   - `MYSQLPASSWORD` → `DB_PASSWORD`に設定
 
-# ログイン
-railway login
+### マイグレーションの実行
 
-# プロジェクトに接続
-railway link
-
-# マイグレーション実行
-railway run php artisan migrate --force
-
-# ストレージリンク作成
-railway run php artisan storage:link
-
-# 設定キャッシュ
-railway run php artisan config:cache
-railway run php artisan route:cache
-railway run php artisan view:cache
-```
-
-#### Railwayダッシュボードから実行する場合
-
-1. サービスをクリック
-2. 「Deployments」タブを開く
-3. 「View Logs」でターミナルにアクセス
-4. 以下のコマンドを実行：
+アプリケーションが起動したら、Railwayダッシュボードのターミナルで以下を実行：
 
 ```bash
 php artisan migrate --force
-php artisan storage:link
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
 ```
 
-### 9. APP_URLの設定
+---
 
-Railwayが生成したURLを`APP_URL`環境変数に設定します：
+## よくある問題と解決方法
 
-1. Railwayダッシュボードでサービスをクリック
-2. 「Settings」→「Networking」を開く
-3. 「Generate Domain」で生成されたURLをコピー（例: `https://your-app.up.railway.app`）
-4. 「Variables」タブで`APP_URL`に設定
+### 1. 500エラーが発生する
 
-### 10. カスタムドメインの設定（オプション）
+#### APP_KEYが設定されていない
 
-1. Railwayダッシュボードで「Settings」→「Networking」を開く
-2. 「Custom Domain」でドメインを追加
-3. DNS設定を更新
+**症状**: `No application encryption key has been specified`
 
-## トラブルシューティング
+**解決方法**:
+1. Railwayダッシュボードのターミナルで以下を実行：
+   ```bash
+   php artisan key:generate --show
+   ```
+2. 出力されたキーを「Variables」タブで`APP_KEY`に設定
 
-### ビルドエラー
+#### データベース接続エラー
 
-- `composer install`が失敗する場合：
-  - `composer.json`の依存関係を確認
-  - Railwayのログで詳細なエラーを確認
+**症状**: `SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo for mysql.railway.internal failed`
 
-### データベース接続エラー
+**解決方法**:
+1. データベースサービスが起動しているか確認
+2. データベースサービスとアプリケーションサービスが同じプロジェクト内にあるか確認
+3. 環境変数`DB_HOST`、`DB_PORT`、`DB_DATABASE`、`DB_USERNAME`、`DB_PASSWORD`が正しく設定されているか確認
 
-- 環境変数が正しく設定されているか確認
-- データベースサービスが起動しているか確認
-- 接続情報を再確認
+### 2. CSSが読み込まれない（Mixed Contentエラー）
 
-### ストレージエラー
+**症状**: `Mixed Content: The page at 'https://...' was loaded over HTTPS, but requested an insecure stylesheet 'http://...'`
 
-- `storage:link`コマンドが実行されているか確認
-- `storage/app/public`ディレクトリの権限を確認
+**解決方法**:
+- この問題は既に修正済みです（相対パスを使用）
+- まだ発生する場合は、`APP_URL`環境変数が`https://`で始まっているか確認
 
-### 500エラー
+### 3. キャッシュエラー
 
-- `APP_DEBUG=true`に一時的に設定してエラー詳細を確認
-- ログファイル（`storage/logs/laravel.log`）を確認
-- 環境変数がすべて設定されているか確認
+**症状**: `SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo for mysql.railway.internal failed (Connection: mysql, SQL: delete from cache)`
 
-## 環境変数の自動設定（Railwayデータベース）
+**解決方法**:
+- 環境変数`CACHE_STORE=file`を設定
+- 環境変数`SESSION_DRIVER=file`を設定
 
-Railwayのデータベースサービスを使用する場合、以下のように環境変数を設定できます：
+### 4. ヘルスチェックが失敗する
 
-```
-DB_CONNECTION=mysql
-DB_HOST=${{MySQL.MYSQLHOST}}
-DB_PORT=${{MySQL.MYSQLPORT}}
-DB_DATABASE=${{MySQL.MYSQLDATABASE}}
-DB_USERNAME=${{MySQL.MYSQLUSER}}
-DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
-```
+**症状**: Healthcheck failed with "service unavailable"
 
-またはPostgreSQLの場合：
+**解決方法**:
+1. アプリケーションが正常に起動しているか確認（「Logs」タブで確認）
+2. エラーログを確認
+3. 環境変数が正しく設定されているか確認
 
-```
-DB_CONNECTION=pgsql
-DB_HOST=${{Postgres.PGHOST}}
-DB_PORT=${{Postgres.PGPORT}}
-DB_DATABASE=${{Postgres.PGDATABASE}}
-DB_USERNAME=${{Postgres.PGUSER}}
-DB_PASSWORD=${{Postgres.PGPASSWORD}}
-```
+### 5. ローカル環境からマイグレーションを実行できない
 
-## 継続的デプロイ（CI/CD）
+**症状**: `php_network_getaddresses: getaddrinfo for mysql.railway.internal failed`
 
-GitHubリポジトリと接続している場合、`main`ブランチへのプッシュで自動的にデプロイされます。
+**原因**: `mysql.railway.internal`はRailwayの内部ネットワークでのみ使用可能
 
-## 参考リンク
+**解決方法**:
+- Railwayダッシュボードのターミナルから実行する（推奨）
+- または、ローカル環境の`.env`で公開URL（`metro.proxy.rlwy.net`など）を使用
 
-- [Railway Documentation](https://docs.railway.app/)
-- [Laravel Deployment Guide](https://laravel.com/docs/deployment)
+---
 
+## デプロイ後の確認事項
+
+1. ✅ アプリケーションが正常に起動しているか（「Deployments」タブで確認）
+2. ✅ エラーログがないか（「Logs」タブで確認）
+3. ✅ ブラウザでアプリケーションにアクセスできるか
+4. ✅ 管理画面にログインできるか（`/admin/login`）
+5. ✅ データベースマイグレーションが実行されているか
+
+---
+
+## 参考資料
+
+- [Railway公式ドキュメント](https://docs.railway.app/)
+- [Laravel公式ドキュメント](https://laravel.com/docs)
