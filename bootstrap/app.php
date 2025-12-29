@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.admin' => \App\Http\Middleware\AuthenticateAdmin::class,
         ]);
+        
+        // Force HTTPS in production
+        if (env('APP_ENV') === 'production') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
