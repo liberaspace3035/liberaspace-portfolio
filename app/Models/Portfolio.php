@@ -31,12 +31,13 @@ class Portfolio extends Model
             return null;
         }
 
-        // R2を使用する場合は's3'ディスクを直接指定
-        $disk = env('FILESYSTEM_DISK', 'public') === 's3' ? 's3' : 'public';
+        // R2またはS3を使用する場合は直接指定
+        $filesystemDisk = env('FILESYSTEM_DISK', 'public');
+        $disk = in_array($filesystemDisk, ['r2', 's3']) ? $filesystemDisk : 'public';
         
         // For S3/R2, use Storage::url()
-        if ($disk === 's3') {
-            return Storage::disk('s3')->url($this->image_path);
+        if (in_array($disk, ['r2', 's3'])) {
+            return Storage::disk($disk)->url($this->image_path);
         }
         
         // For local/public disk, use asset()

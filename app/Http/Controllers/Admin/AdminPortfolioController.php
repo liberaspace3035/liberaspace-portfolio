@@ -106,29 +106,54 @@ class AdminPortfolioController extends Controller
             return back()->withErrors($e->errors())->withInput();
         }
 
-                Log::info('Store request received', [
-                    'has_file' => $request->hasFile('image'),
-                    'file_size' => $request->hasFile('image') ? $request->file('image')->getSize() : null,
-                    'file_size_mb' => $request->hasFile('image') ? round($request->file('image')->getSize() / 1024 / 1024, 2) . 'MB' : null,
-                    'php_upload_max_filesize' => ini_get('upload_max_filesize'),
-                    'php_post_max_size' => ini_get('post_max_size'),
-                    'php_memory_limit' => ini_get('memory_limit'),
-                ]);
+        // 最初にファイルの状態を確認
+        Log::info('Store request received', [
+            'has_file' => $request->hasFile('image'),
+            'file_input_exists' => $request->has('image'),
+            'content_type' => $request->header('Content-Type'),
+            'content_length' => $request->header('Content-Length'),
+        ]);
+
+        // PHP設定を詳細にログ出力
+        Log::info('PHP Configuration:', [
+            'upload_max_filesize' => ini_get('upload_max_filesize'),
+            'post_max_size' => ini_get('post_max_size'),
+            'memory_limit' => ini_get('memory_limit'),
+            'max_file_uploads' => ini_get('max_file_uploads'),
+            'file_uploads' => ini_get('file_uploads') ? 'enabled' : 'disabled',
+        ]);
 
         if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            Log::info('File details:', [
+                'file_size' => $file->getSize(),
+                'file_size_mb' => round($file->getSize() / 1024 / 1024, 2),
+                'file_mime_type' => $file->getMimeType(),
+                'file_original_name' => $file->getClientOriginalName(),
+                'file_is_valid' => $file->isValid(),
+                'file_error' => $file->getError(),
+            ]);
+
             try {
-                // R2を使用する場合は's3'ディスクを直接指定
-                $disk = env('FILESYSTEM_DISK', 'public') === 's3' ? 's3' : 'public';
+                // R2またはS3を使用する場合は直接指定
+                $filesystemDisk = env('FILESYSTEM_DISK', 'public');
+                $disk = in_array($filesystemDisk, ['r2', 's3']) ? $filesystemDisk : 'public';
+                
                 Log::info('Uploading image', [
                     'disk' => $disk,
-                    'env_FILESYSTEM_DISK' => env('FILESYSTEM_DISK', 'not set'),
+                    'env_FILESYSTEM_DISK' => $filesystemDisk,
+                    'config_filesystems.default' => config('filesystems.default'),
                 ]);
-                Log::info('S3/R2 Config Check:', [
-                    'endpoint' => config('filesystems.disks.s3.endpoint'),
-                    'bucket' => config('filesystems.disks.s3.bucket'),
-                    'key' => config('filesystems.disks.s3.key') ? 'set' : 'not set',
-                    'secret' => config('filesystems.disks.s3.secret') ? 'set' : 'not set',
-                    'use_path_style' => config('filesystems.disks.s3.use_path_style_endpoint'),
+
+                // 使用するディスクの設定を確認
+                $diskConfig = config("filesystems.disks.{$disk}");
+                Log::info("Disk '{$disk}' Config Check:", [
+                    'driver' => $diskConfig['driver'] ?? 'not set',
+                    'endpoint' => $diskConfig['endpoint'] ?? 'not set',
+                    'bucket' => $diskConfig['bucket'] ?? 'not set',
+                    'key' => isset($diskConfig['key']) && $diskConfig['key'] ? 'set' : 'not set',
+                    'secret' => isset($diskConfig['secret']) && $diskConfig['secret'] ? 'set' : 'not set',
+                    'use_path_style_endpoint' => $diskConfig['use_path_style_endpoint'] ?? 'not set',
                 ]);
                 
                 $imagePath = $request->file('image')->store('portfolios', $disk);
@@ -235,15 +260,43 @@ class AdminPortfolioController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            Log::info('Update - File details:', [
+                'file_size' => $file->getSize(),
+                'file_size_mb' => round($file->getSize() / 1024 / 1024, 2),
+                'file_mime_type' => $file->getMimeType(),
+                'file_original_name' => $file->getClientOriginalName(),
+                'file_is_valid' => $file->isValid(),
+                'file_error' => $file->getError(),
+            ]);
+
             try {
-                // R2を使用する場合は's3'ディスクを直接指定
-                $disk = env('FILESYSTEM_DISK', 'public') === 's3' ? 's3' : 'public';
+                // R2またはS3を使用する場合は直接指定
+                $filesystemDisk = env('FILESYSTEM_DISK', 'public');
+                $disk = in_array($filesystemDisk, ['r2', 's3']) ? $filesystemDisk : 'public';
+                
+                Log::info('Update - Uploading image', [
+                    'disk' => $disk,
+                    'env_FILESYSTEM_DISK' => $filesystemDisk,
+                    'config_filesystems.default' => config('filesystems.default'),
+                ]);
+
+                // 使用するディスクの設定を確認
+                $diskConfig = config("filesystems.disks.{$disk}");
+                Log::info("Update - Disk '{$disk}' Config Check:", [
+                    'driver' => $diskConfig['driver'] ?? 'not set',
+                    'endpoint' => $diskConfig['endpoint'] ?? 'not set',
+                    'bucket' => $diskConfig['bucket'] ?? 'not set',
+                    'key' => isset($diskConfig['key']) && $diskConfig['key'] ? 'set' : 'not set',
+                    'secret' => isset($diskConfig['secret']) && $diskConfig['secret'] ? 'set' : 'not set',
+                    'use_path_style_endpoint' => $diskConfig['use_path_style_endpoint'] ?? 'not set',
+                ]);
                 
                 // Delete old image
                 if ($portfolio->image_path) {
                     Storage::disk($disk)->delete($portfolio->image_path);
                 }
-                Log::info('Uploading image to disk: ' . $disk);
+                
                 $imagePath = $request->file('image')->store('portfolios', $disk);
                 Log::info('Image uploaded successfully: ' . $imagePath);
                 $validated['image_path'] = $imagePath;
@@ -290,8 +343,12 @@ class AdminPortfolioController extends Controller
     {
         $portfolio = Portfolio::findOrFail($id);
         
-        // Delete image - R2を使用する場合は's3'ディスクを直接指定
-        $disk = env('FILESYSTEM_DISK', 'public') === 's3' ? 's3' : 'public';
+        // Delete image - R2またはS3を使用する場合は直接指定
+        $filesystemDisk = env('FILESYSTEM_DISK', 'public');
+        $disk = in_array($filesystemDisk, ['r2', 's3']) ? $filesystemDisk : 'public';
+        
+        Log::info('Delete - Using disk: ' . $disk);
+        
         if ($portfolio->image_path) {
             Storage::disk($disk)->delete($portfolio->image_path);
         }

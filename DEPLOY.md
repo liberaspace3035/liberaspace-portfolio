@@ -79,9 +79,22 @@
 
 #### ストレージ設定（Cloudflare R2）
 
+**方法1: `r2`ディスクを使用（推奨）**
+
 | 変数名 | 値 | 説明 |
 |--------|-----|------|
-| `FILESYSTEM_DISK` | `s3` | **重要**: R2を使用する場合は必ず`s3`を設定 |
+| `FILESYSTEM_DISK` | `r2` | **重要**: R2を使用する場合は`r2`を設定 |
+| `R2_ACCESS_KEY_ID` | R2のAccess Key ID | Cloudflare R2の認証情報 |
+| `R2_SECRET_ACCESS_KEY` | R2のSecret Access Key | Cloudflare R2の認証情報 |
+| `R2_BUCKET` | R2のバケット名 | 例: `liberaspace` |
+| `R2_ENDPOINT` | R2のエンドポイントURL | 例: `https://xxxxx.r2.cloudflarestorage.com`（バケット名は含めない） |
+| `R2_URL` | R2の公開URL | 例: `https://pub-xxxxx.r2.dev` |
+
+**方法2: `s3`ディスクを使用**
+
+| 変数名 | 値 | 説明 |
+|--------|-----|------|
+| `FILESYSTEM_DISK` | `s3` | **重要**: R2を使用する場合は`s3`を設定 |
 | `AWS_ACCESS_KEY_ID` | R2のAccess Key ID | Cloudflare R2の認証情報 |
 | `AWS_SECRET_ACCESS_KEY` | R2のSecret Access Key | Cloudflare R2の認証情報 |
 | `AWS_DEFAULT_REGION` | `auto` | R2のリージョン（通常は`auto`） |
@@ -91,8 +104,8 @@
 | `AWS_USE_PATH_STYLE_ENDPOINT` | `true` | R2用に`true`を設定 |
 
 **重要**: 
-- `FILESYSTEM_DISK=s3`を設定しないと、ローカルの`public`ディスクが使用されます
-- `AWS_ENDPOINT`にはバケット名を含めないでください（例: `https://xxxxx.r2.cloudflarestorage.com`）
+- `FILESYSTEM_DISK=r2`または`FILESYSTEM_DISK=s3`を設定しないと、ローカルの`public`ディスクが使用されます
+- `R2_ENDPOINT`または`AWS_ENDPOINT`にはバケット名を含めないでください（例: `https://xxxxx.r2.cloudflarestorage.com`）
 
 #### PHP設定（オプション - 大きなファイルをアップロードする場合）
 
@@ -223,6 +236,13 @@ php artisan migrate --force
    - Cloudflare R2ダッシュボードで`portfolios/`フォルダに画像が保存されているか確認
    - 画像URLがR2の公開URL（`https://pub-xxxxx.r2.dev/...`）になっているか確認
    - 画像URLを直接ブラウザで開いて表示できるか確認
+7. ✅ **PHP設定の確認**（画像アップロードが失敗する場合）:
+   - Railwayダッシュボードのターミナルで以下を実行：
+     ```bash
+     php -i | grep 'upload_max_filesize\|post_max_size'
+     ```
+   - ログで`PHP Configuration:`セクションを確認
+   - 必要に応じて`PHP_INI_UPLOAD_MAX_FILESIZE`と`PHP_INI_POST_MAX_SIZE`を設定
 
 ---
 
