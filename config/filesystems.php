@@ -69,7 +69,7 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
-            'throw' => false,
+            'throw' => true, // Enable exception throwing for better error handling
             'report' => false,
         ],
 

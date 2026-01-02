@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 
 class AdminPortfolioController extends Controller
 {
@@ -99,9 +100,25 @@ class AdminPortfolioController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $disk = env('FILESYSTEM_DISK', 'public');
-            $imagePath = $request->file('image')->store('portfolios', $disk);
-            $validated['image_path'] = $imagePath;
+            try {
+                $disk = env('FILESYSTEM_DISK', 'public');
+                \Log::info('Uploading image to disk: ' . $disk);
+                \Log::info('R2 Config Check:', [
+                    'endpoint' => env('AWS_ENDPOINT'),
+                    'bucket' => env('AWS_BUCKET'),
+                    'key' => env('AWS_ACCESS_KEY_ID') ? 'set' : 'not set',
+                    'secret' => env('AWS_SECRET_ACCESS_KEY') ? 'set' : 'not set',
+                ]);
+                
+                $imagePath = $request->file('image')->store('portfolios', $disk);
+                \Log::info('Image uploaded successfully: ' . $imagePath);
+                $validated['image_path'] = $imagePath;
+            } catch (\Exception $e) {
+                \Log::error('Image upload failed: ' . $e->getMessage(), [
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                return back()->withErrors(['image' => '画像のアップロードに失敗しました: ' . $e->getMessage()])->withInput();
+            }
         }
 
         $validated['is_published'] = $request->has('is_published');
@@ -147,13 +164,22 @@ class AdminPortfolioController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image
-            $disk = env('FILESYSTEM_DISK', 'public');
-            if ($portfolio->image_path) {
-                Storage::disk($disk)->delete($portfolio->image_path);
+            try {
+                // Delete old image
+                $disk = env('FILESYSTEM_DISK', 'public');
+                if ($portfolio->image_path) {
+                    Storage::disk($disk)->delete($portfolio->image_path);
+                }
+                \Log::info('Uploading image to disk: ' . $disk);
+                $imagePath = $request->file('image')->store('portfolios', $disk);
+                \Log::info('Image uploaded successfully: ' . $imagePath);
+                $validated['image_path'] = $imagePath;
+            } catch (\Exception $e) {
+                \Log::error('Image upload failed: ' . $e->getMessage(), [
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                return back()->withErrors(['image' => '画像のアップロードに失敗しました: ' . $e->getMessage()])->withInput();
             }
-            $imagePath = $request->file('image')->store('portfolios', $disk);
-            $validated['image_path'] = $imagePath;
         }
 
         $validated['is_published'] = $request->has('is_published');
