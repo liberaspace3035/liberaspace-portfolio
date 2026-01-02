@@ -102,7 +102,13 @@ class AdminPortfolioController extends Controller
         if ($request->hasFile('image')) {
             try {
                 $disk = config('filesystems.default', 'public');
-                Log::info('Uploading image to disk: ' . $disk);
+                $envDisk = env('FILESYSTEM_DISK', 'not set');
+                Log::info('Uploading image', [
+                    'disk' => $disk,
+                    'env_FILESYSTEM_DISK' => $envDisk,
+                    'config_filesystems.default' => config('filesystems.default'),
+                    'is_r2' => $disk === 'r2',
+                ]);
                 Log::info('R2 Config Check:', [
                     'endpoint' => config('filesystems.disks.r2.endpoint'),
                     'bucket' => config('filesystems.disks.r2.bucket'),
