@@ -89,14 +89,26 @@ class AdminPortfolioController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'required|image|max:2048',
-            'url' => 'nullable|url',
-            'display_order' => 'nullable|integer',
-            'is_published' => 'boolean',
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'category' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'image' => 'required|image|max:10000',
+                'url' => 'nullable|url',
+                'display_order' => 'nullable|integer',
+                'is_published' => 'boolean',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed', [
+                'errors' => $e->errors(),
+            ]);
+            return back()->withErrors($e->errors())->withInput();
+        }
+
+        Log::info('Store request received', [
+            'has_file' => $request->hasFile('image'),
+            'file_size' => $request->hasFile('image') ? $request->file('image')->getSize() : null,
         ]);
 
         if ($request->hasFile('image')) {
