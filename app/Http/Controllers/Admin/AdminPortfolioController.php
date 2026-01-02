@@ -89,7 +89,9 @@ class AdminPortfolioController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all(), $request->file('image'));
         try {
+            dump('store');
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'category' => 'required|string|max:255',
@@ -100,6 +102,7 @@ class AdminPortfolioController extends Controller
                 'is_published' => 'boolean',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
+            dump($e->errors());
             Log::error('Validation failed', [
                 'errors' => $e->errors(),
             ]);
