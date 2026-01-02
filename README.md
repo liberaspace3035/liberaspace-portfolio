@@ -122,15 +122,17 @@ FILESYSTEM_DISK=public
 # ストレージディスクをR2に設定
 FILESYSTEM_DISK=r2
 
-# Cloudflare R2の認証情報
-R2_ACCESS_KEY_ID=your_access_key_id
-R2_SECRET_ACCESS_KEY=your_secret_access_key
-R2_BUCKET=your_bucket_name
-R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
-R2_URL=https://<your-custom-domain>.com
-R2_REGION=auto
-R2_USE_PATH_STYLE_ENDPOINT=true
+# Cloudflare R2の認証情報（AWS_*形式で設定）
+AWS_ACCESS_KEY_ID=your_access_key_id
+AWS_SECRET_ACCESS_KEY=your_secret_access_key
+AWS_BUCKET=your_bucket_name
+AWS_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+AWS_URL=https://<your-custom-domain>.com
+AWS_DEFAULT_REGION=auto
+AWS_USE_PATH_STYLE_ENDPOINT=true
 ```
+
+**注意**: R2はS3互換APIを使用するため、環境変数名は`AWS_*`形式を使用します。これはCloudflare R2の標準的な設定方法です。
 
 #### R2の設定手順
 
@@ -151,6 +153,7 @@ R2_USE_PATH_STYLE_ENDPOINT=true
 4. **環境変数を設定**
    - Railwayダッシュボードで上記の環境変数を設定
    - `FILESYSTEM_DISK=r2`を設定することで、自動的にR2が使用されます
+   - 既存の`AWS_*`環境変数が設定されている場合は、そのまま使用できます
 
 ## Railwayへのデプロイ
 
