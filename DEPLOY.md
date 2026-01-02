@@ -77,6 +77,23 @@
 |--------|-----|------|
 | `ADMIN_PASSWORD` | 任意のパスワード | 管理画面のログインパスワード |
 
+#### ストレージ設定（Cloudflare R2）
+
+| 変数名 | 値 | 説明 |
+|--------|-----|------|
+| `FILESYSTEM_DISK` | `s3` | **重要**: R2を使用する場合は必ず`s3`を設定 |
+| `AWS_ACCESS_KEY_ID` | R2のAccess Key ID | Cloudflare R2の認証情報 |
+| `AWS_SECRET_ACCESS_KEY` | R2のSecret Access Key | Cloudflare R2の認証情報 |
+| `AWS_DEFAULT_REGION` | `auto` | R2のリージョン（通常は`auto`） |
+| `AWS_BUCKET` | R2のバケット名 | 例: `liberaspace` |
+| `AWS_ENDPOINT` | R2のエンドポイントURL | 例: `https://xxxxx.r2.cloudflarestorage.com`（バケット名は含めない） |
+| `AWS_URL` | R2の公開URL | 例: `https://pub-xxxxx.r2.dev` |
+| `AWS_USE_PATH_STYLE_ENDPOINT` | `true` | R2用に`true`を設定 |
+
+**重要**: 
+- `FILESYSTEM_DISK=s3`を設定しないと、ローカルの`public`ディスクが使用されます
+- `AWS_ENDPOINT`にはバケット名を含めないでください（例: `https://xxxxx.r2.cloudflarestorage.com`）
+
 #### PHP設定（オプション - 大きなファイルをアップロードする場合）
 
 | 変数名 | 値 | 説明 |
@@ -201,6 +218,11 @@ php artisan migrate --force
 3. ✅ ブラウザでアプリケーションにアクセスできるか
 4. ✅ 管理画面にログインできるか（`/admin/login`）
 5. ✅ データベースマイグレーションが実行されているか
+6. ✅ **R2ストレージの確認**（R2を使用する場合）:
+   - 管理画面で画像をアップロード
+   - Cloudflare R2ダッシュボードで`portfolios/`フォルダに画像が保存されているか確認
+   - 画像URLがR2の公開URL（`https://pub-xxxxx.r2.dev/...`）になっているか確認
+   - 画像URLを直接ブラウザで開いて表示できるか確認
 
 ---
 
