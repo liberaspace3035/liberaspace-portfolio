@@ -106,10 +106,14 @@ class AdminPortfolioController extends Controller
             return back()->withErrors($e->errors())->withInput();
         }
 
-        Log::info('Store request received', [
-            'has_file' => $request->hasFile('image'),
-            'file_size' => $request->hasFile('image') ? $request->file('image')->getSize() : null,
-        ]);
+                Log::info('Store request received', [
+                    'has_file' => $request->hasFile('image'),
+                    'file_size' => $request->hasFile('image') ? $request->file('image')->getSize() : null,
+                    'file_size_mb' => $request->hasFile('image') ? round($request->file('image')->getSize() / 1024 / 1024, 2) . 'MB' : null,
+                    'php_upload_max_filesize' => ini_get('upload_max_filesize'),
+                    'php_post_max_size' => ini_get('post_max_size'),
+                    'php_memory_limit' => ini_get('memory_limit'),
+                ]);
 
         if ($request->hasFile('image')) {
             try {
@@ -197,7 +201,7 @@ class AdminPortfolioController extends Controller
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:10000',
             'url' => 'nullable|url',
             'display_order' => 'nullable|integer',
             'is_published' => 'boolean',
