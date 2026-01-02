@@ -107,13 +107,26 @@
 - `FILESYSTEM_DISK=r2`または`FILESYSTEM_DISK=s3`を設定しないと、ローカルの`public`ディスクが使用されます
 - `R2_ENDPOINT`または`AWS_ENDPOINT`にはバケット名を含めないでください（例: `https://xxxxx.r2.cloudflarestorage.com`）
 
-#### PHP設定（オプション - 大きなファイルをアップロードする場合）
+#### PHP設定（**重要** - 画像アップロードが失敗する場合）
+
+画像アップロードで`error: 1`（UPLOAD_ERR_INI_SIZE）が発生する場合、PHPのファイルサイズ制限が原因です。
+
+**必須設定**（画像アップロードを有効にするため）:
 
 | 変数名 | 値 | 説明 |
 |--------|-----|------|
-| `PHP_INI_UPLOAD_MAX_FILESIZE` | `10M` | 最大アップロードファイルサイズ（デフォルト: 2M） |
-| `PHP_INI_POST_MAX_SIZE` | `12M` | 最大POSTデータサイズ（upload_max_filesizeより大きく設定） |
-| `PHP_INI_MEMORY_LIMIT` | `256M` | PHPメモリ制限 |
+| `PHP_INI_UPLOAD_MAX_FILESIZE` | `10M` | **必須**: 最大アップロードファイルサイズ（デフォルト: 2M） |
+| `PHP_INI_POST_MAX_SIZE` | `12M` | **必須**: 最大POSTデータサイズ（upload_max_filesizeより大きく設定） |
+| `PHP_INI_MEMORY_LIMIT` | `256M` | PHPメモリ制限（推奨） |
+
+**注意**:
+- `PHP_INI_POST_MAX_SIZE`は`PHP_INI_UPLOAD_MAX_FILESIZE`より大きく設定してください
+- スクリーンショットや大きな画像をアップロードする場合は、`10M`以上を推奨
+- 設定後は**Railwayでサービスを再起動**してください
+
+**エラーの確認方法**:
+- アップロード失敗時に「ファイルサイズがPHPの設定（upload_max_filesize: 2M）を超えています」というメッセージが表示される
+- Railwayのログで`File upload error (PHP level)`を確認
 
 ### 環境変数の設定手順
 

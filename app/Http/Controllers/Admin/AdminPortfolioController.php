@@ -89,9 +89,38 @@ class AdminPortfolioController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all(), $request->file('image'));
+        // ファイルアップロードエラーのチェック（PHP設定による拒否を検出）
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $uploadError = $file->getError();
+            
+            if ($uploadError !== UPLOAD_ERR_OK) {
+                $errorMessages = [
+                    UPLOAD_ERR_INI_SIZE => 'ファイルサイズがPHPの設定（upload_max_filesize: ' . ini_get('upload_max_filesize') . '）を超えています。',
+                    UPLOAD_ERR_FORM_SIZE => 'ファイルサイズがフォームの制限を超えています。',
+                    UPLOAD_ERR_PARTIAL => 'ファイルが一部しかアップロードされませんでした。',
+                    UPLOAD_ERR_NO_FILE => 'ファイルがアップロードされませんでした。',
+                    UPLOAD_ERR_NO_TMP_DIR => '一時ディレクトリが見つかりません。',
+                    UPLOAD_ERR_CANT_WRITE => 'ファイルの書き込みに失敗しました。',
+                    UPLOAD_ERR_EXTENSION => 'PHP拡張機能によってアップロードが停止されました。',
+                ];
+                
+                $errorMessage = $errorMessages[$uploadError] ?? 'アップロードエラーが発生しました（エラーコード: ' . $uploadError . '）。';
+                
+                Log::error('File upload error (PHP level)', [
+                    'error_code' => $uploadError,
+                    'error_message' => $errorMessage,
+                    'upload_max_filesize' => ini_get('upload_max_filesize'),
+                    'post_max_size' => ini_get('post_max_size'),
+                    'memory_limit' => ini_get('memory_limit'),
+                    'file_original_name' => $file->getClientOriginalName(),
+                ]);
+                
+                return back()->withErrors(['image' => $errorMessage])->withInput();
+            }
+        }
+
         try {
-            dump('store');
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'category' => 'required|string|max:255',
@@ -102,7 +131,6 @@ class AdminPortfolioController extends Controller
                 'is_published' => 'boolean',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            dump($e->errors());
             Log::error('Validation failed', [
                 'errors' => $e->errors(),
             ]);
@@ -251,6 +279,37 @@ class AdminPortfolioController extends Controller
     public function update(Request $request, string $id)
     {
         $portfolio = Portfolio::findOrFail($id);
+
+        // ファイルアップロードエラーのチェック（PHP設定による拒否を検出）
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $uploadError = $file->getError();
+            
+            if ($uploadError !== UPLOAD_ERR_OK) {
+                $errorMessages = [
+                    UPLOAD_ERR_INI_SIZE => 'ファイルサイズがPHPの設定（upload_max_filesize: ' . ini_get('upload_max_filesize') . '）を超えています。',
+                    UPLOAD_ERR_FORM_SIZE => 'ファイルサイズがフォームの制限を超えています。',
+                    UPLOAD_ERR_PARTIAL => 'ファイルが一部しかアップロードされませんでした。',
+                    UPLOAD_ERR_NO_FILE => 'ファイルがアップロードされませんでした。',
+                    UPLOAD_ERR_NO_TMP_DIR => '一時ディレクトリが見つかりません。',
+                    UPLOAD_ERR_CANT_WRITE => 'ファイルの書き込みに失敗しました。',
+                    UPLOAD_ERR_EXTENSION => 'PHP拡張機能によってアップロードが停止されました。',
+                ];
+                
+                $errorMessage = $errorMessages[$uploadError] ?? 'アップロードエラーが発生しました（エラーコード: ' . $uploadError . '）。';
+                
+                Log::error('File upload error (PHP level) - Update', [
+                    'error_code' => $uploadError,
+                    'error_message' => $errorMessage,
+                    'upload_max_filesize' => ini_get('upload_max_filesize'),
+                    'post_max_size' => ini_get('post_max_size'),
+                    'memory_limit' => ini_get('memory_limit'),
+                    'file_original_name' => $file->getClientOriginalName(),
+                ]);
+                
+                return back()->withErrors(['image' => $errorMessage])->withInput();
+            }
+        }
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
