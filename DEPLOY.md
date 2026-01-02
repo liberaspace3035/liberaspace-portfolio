@@ -128,6 +128,22 @@
 - アップロード失敗時に「ファイルサイズがPHPの設定（upload_max_filesize: 2M）を超えています」というメッセージが表示される
 - Railwayのログで`File upload error (PHP level)`を確認
 
+**PHP設定の確認方法（Railway）**:
+1. Railwayダッシュボードでアプリケーションサービスの「Deployments」タブを開く
+2. 最新のデプロイメントの「View Logs」をクリック
+3. または、ターミナルで以下を実行：
+   ```bash
+   php -i | grep 'upload_max_filesize\|post_max_size\|memory_limit'
+   ```
+4. ログで`PHP Configuration:`セクションを確認（アップロード時に自動的にログ出力されます）
+
+**トラブルシューティング**:
+- `error: 1`が続く場合：
+  1. Railwayの「Variables」タブで`PHP_INI_UPLOAD_MAX_FILESIZE`と`PHP_INI_POST_MAX_SIZE`が正しく設定されているか確認
+  2. **サービスを再起動**（重要！環境変数の変更は再起動しないと反映されません）
+  3. 再起動後、再度アップロードを試す
+  4. まだエラーが出る場合、Railwayのログで実際のPHP設定値を確認
+
 ### 環境変数の設定手順
 
 1. Railwayダッシュボードでアプリケーションサービスを開く

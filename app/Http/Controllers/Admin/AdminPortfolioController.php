@@ -89,7 +89,6 @@ class AdminPortfolioController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all(), $request->file('image'));
         // ファイルアップロードエラーのチェック（PHP設定による拒否を検出）
         if ($request->hasFile('image')) {
             $file = $request->file('image');
