@@ -115,11 +115,31 @@ class AdminPortfolioController extends Controller
                 Log::info('Image uploaded successfully: ' . $imagePath);
                 $validated['image_path'] = $imagePath;
             } catch (\Exception $e) {
-                Log::error('Image upload failed: ' . $e->getMessage(), [
+                $errorMessage = $e->getMessage();
+                $errorClass = get_class($e);
+                
+                Log::error('Image upload failed', [
+                    'message' => $errorMessage,
+                    'class' => $errorClass,
                     'trace' => $e->getTraceAsString(),
                     'disk' => $disk ?? 'unknown',
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
                 ]);
-                return back()->withErrors(['image' => '画像のアップロードに失敗しました: ' . $e->getMessage()])->withInput();
+                
+                // より詳細なエラーメッセージを表示
+                $userMessage = '画像のアップロードに失敗しました。';
+                if (str_contains($errorMessage, 'Could not resolve host')) {
+                    $userMessage .= ' R2エンドポイントに接続できません。エンドポイントURLを確認してください。';
+                } elseif (str_contains($errorMessage, 'Access Denied') || str_contains($errorMessage, '403')) {
+                    $userMessage .= ' 認証情報が正しくないか、アクセス権限がありません。';
+                } elseif (str_contains($errorMessage, 'No such bucket')) {
+                    $userMessage .= ' バケットが見つかりません。バケット名を確認してください。';
+                } else {
+                    $userMessage .= ' エラー: ' . $errorMessage;
+                }
+                
+                return back()->withErrors(['image' => $userMessage])->withInput();
             }
         }
 
@@ -177,11 +197,31 @@ class AdminPortfolioController extends Controller
                 Log::info('Image uploaded successfully: ' . $imagePath);
                 $validated['image_path'] = $imagePath;
             } catch (\Exception $e) {
-                Log::error('Image upload failed: ' . $e->getMessage(), [
+                $errorMessage = $e->getMessage();
+                $errorClass = get_class($e);
+                
+                Log::error('Image upload failed', [
+                    'message' => $errorMessage,
+                    'class' => $errorClass,
                     'trace' => $e->getTraceAsString(),
                     'disk' => $disk ?? 'unknown',
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
                 ]);
-                return back()->withErrors(['image' => '画像のアップロードに失敗しました: ' . $e->getMessage()])->withInput();
+                
+                // より詳細なエラーメッセージを表示
+                $userMessage = '画像のアップロードに失敗しました。';
+                if (str_contains($errorMessage, 'Could not resolve host')) {
+                    $userMessage .= ' R2エンドポイントに接続できません。エンドポイントURLを確認してください。';
+                } elseif (str_contains($errorMessage, 'Access Denied') || str_contains($errorMessage, '403')) {
+                    $userMessage .= ' 認証情報が正しくないか、アクセス権限がありません。';
+                } elseif (str_contains($errorMessage, 'No such bucket')) {
+                    $userMessage .= ' バケットが見つかりません。バケット名を確認してください。';
+                } else {
+                    $userMessage .= ' エラー: ' . $errorMessage;
+                }
+                
+                return back()->withErrors(['image' => $userMessage])->withInput();
             }
         }
 
