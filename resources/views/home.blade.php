@@ -177,18 +177,25 @@
             </p>
           </div>
           <div class="about-stats">
+            @forelse($heroStats as $stat)
             <div class="about-stat">
-              <div class="about-stat-number">20+</div>
+              <div class="stat-number" data-target="{{ $stat->value }}">0</div>
+              <div class="about-stat-label">{{ $stat->label }}</div>
+            </div>
+            @empty
+            <div class="about-stat">
+              <div class="stat-number" data-target="20">0</div>
               <div class="about-stat-label">案件実績</div>
             </div>
             <div class="about-stat">
-              <div class="about-stat-number">10+</div>
+              <div class="stat-number" data-target="10">0</div>
               <div class="about-stat-label">コーポレートサイト</div>
             </div>
             <div class="about-stat">
-              <div class="about-stat-number">3</div>
+              <div class="stat-number" data-target="3">0</div>
               <div class="about-stat-label">WEBアプリ</div>
             </div>
+            @endforelse
           </div>
         </div>
         <div class="about-visual">

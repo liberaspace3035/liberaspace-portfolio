@@ -922,12 +922,8 @@ section {
   text-align: center;
 }
 
-.about-stat-number {
-  font-family: $font-display;
-  font-size: $font-size-3xl;
-  font-weight: 700;
-  @include gradient-text;
-  margin-bottom: $spacing-xs;
+.about-stat .stat-number {
+  font-size: $font-size-3xl; // Slightly smaller for about section
 }
 
 .about-stat-label {
