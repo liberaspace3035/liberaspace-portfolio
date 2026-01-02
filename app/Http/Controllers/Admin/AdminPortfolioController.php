@@ -101,13 +101,14 @@ class AdminPortfolioController extends Controller
 
         if ($request->hasFile('image')) {
             try {
-                $disk = env('FILESYSTEM_DISK', 'public');
+                $disk = config('filesystems.default', 'public');
                 Log::info('Uploading image to disk: ' . $disk);
                 Log::info('R2 Config Check:', [
-                    'endpoint' => env('AWS_ENDPOINT'),
-                    'bucket' => env('AWS_BUCKET'),
-                    'key' => env('AWS_ACCESS_KEY_ID') ? 'set' : 'not set',
-                    'secret' => env('AWS_SECRET_ACCESS_KEY') ? 'set' : 'not set',
+                    'endpoint' => config('filesystems.disks.r2.endpoint'),
+                    'bucket' => config('filesystems.disks.r2.bucket'),
+                    'key' => config('filesystems.disks.r2.key') ? 'set' : 'not set',
+                    'secret' => config('filesystems.disks.r2.secret') ? 'set' : 'not set',
+                    'use_path_style' => config('filesystems.disks.r2.use_path_style_endpoint'),
                 ]);
                 
                 $imagePath = $request->file('image')->store('portfolios', $disk);
@@ -116,6 +117,7 @@ class AdminPortfolioController extends Controller
             } catch (\Exception $e) {
                 Log::error('Image upload failed: ' . $e->getMessage(), [
                     'trace' => $e->getTraceAsString(),
+                    'disk' => $disk ?? 'unknown',
                 ]);
                 return back()->withErrors(['image' => '画像のアップロードに失敗しました: ' . $e->getMessage()])->withInput();
             }
@@ -166,7 +168,7 @@ class AdminPortfolioController extends Controller
         if ($request->hasFile('image')) {
             try {
                 // Delete old image
-                $disk = env('FILESYSTEM_DISK', 'public');
+                $disk = config('filesystems.default', 'public');
                 if ($portfolio->image_path) {
                     Storage::disk($disk)->delete($portfolio->image_path);
                 }
@@ -177,6 +179,7 @@ class AdminPortfolioController extends Controller
             } catch (\Exception $e) {
                 Log::error('Image upload failed: ' . $e->getMessage(), [
                     'trace' => $e->getTraceAsString(),
+                    'disk' => $disk ?? 'unknown',
                 ]);
                 return back()->withErrors(['image' => '画像のアップロードに失敗しました: ' . $e->getMessage()])->withInput();
             }
@@ -197,7 +200,7 @@ class AdminPortfolioController extends Controller
         $portfolio = Portfolio::findOrFail($id);
         
         // Delete image
-        $disk = env('FILESYSTEM_DISK', 'public');
+        $disk = config('filesystems.default', 'public');
         if ($portfolio->image_path) {
             Storage::disk($disk)->delete($portfolio->image_path);
         }

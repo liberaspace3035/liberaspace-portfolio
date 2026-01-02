@@ -9,6 +9,17 @@
 </div>
 
 <div class="card">
+    @if ($errors->any())
+    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="color: #ef4444; margin-bottom: 1rem; font-size: 1.125rem; font-weight: 600;">エラーが発生しました</h3>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            @foreach ($errors->all() as $error)
+            <li style="color: #ef4444; margin-bottom: 0.5rem;">• {{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <form method="POST" action="{{ route('admin.portfolios.store') }}" enctype="multipart/form-data">
         @csrf
         
