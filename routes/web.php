@@ -16,6 +16,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Admin routes
 Route::prefix('admin')->name('admin.')->middleware(['web'])->group(function () {
+    // Redirect /admin/ to /admin/login or /admin/dashboard
+    Route::get('/', function () {
+        if (session('admin_authenticated')) {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('admin.login');
+    });
+    
     Route::get('/login', [AdminPortfolioController::class, 'showLogin'])->name('login');
     Route::post('/login', [AdminPortfolioController::class, 'login'])->name('login.post');
     Route::get('/logout', [AdminPortfolioController::class, 'logout'])->name('logout');
