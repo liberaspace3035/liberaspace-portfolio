@@ -99,7 +99,8 @@ class AdminPortfolioController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('portfolios', 'public');
+            $disk = env('FILESYSTEM_DISK', 'public');
+            $imagePath = $request->file('image')->store('portfolios', $disk);
             $validated['image_path'] = $imagePath;
         }
 
@@ -147,10 +148,11 @@ class AdminPortfolioController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old image
+            $disk = env('FILESYSTEM_DISK', 'public');
             if ($portfolio->image_path) {
-                Storage::disk('public')->delete($portfolio->image_path);
+                Storage::disk($disk)->delete($portfolio->image_path);
             }
-            $imagePath = $request->file('image')->store('portfolios', 'public');
+            $imagePath = $request->file('image')->store('portfolios', $disk);
             $validated['image_path'] = $imagePath;
         }
 
@@ -169,8 +171,9 @@ class AdminPortfolioController extends Controller
         $portfolio = Portfolio::findOrFail($id);
         
         // Delete image
+        $disk = env('FILESYSTEM_DISK', 'public');
         if ($portfolio->image_path) {
-            Storage::disk('public')->delete($portfolio->image_path);
+            Storage::disk($disk)->delete($portfolio->image_path);
         }
 
         $portfolio->delete();

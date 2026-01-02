@@ -15,6 +15,8 @@ Liberaspaceのポートフォリオサイトです。制作実績を独自CMSで
 - **Frontend**: HTML5, SCSS, JavaScript
 - **Database**: MySQL / SQLite
 - **Storage**: Laravel Storage (画像ファイル)
+  - ローカル環境: ローカルストレージ (`public` disk)
+  - 本番環境: Cloudflare R2 (`r2` disk)
 
 ## セットアップ
 
@@ -46,6 +48,10 @@ DB_PASSWORD=
 
 # 管理画面のパスワードを設定（任意）
 ADMIN_PASSWORD=your_password_here
+
+# ストレージ設定
+# ローカル環境では 'public' を使用
+FILESYSTEM_DISK=public
 ```
 
 ### 3. データベースのセットアップ
@@ -54,11 +60,15 @@ ADMIN_PASSWORD=your_password_here
 php artisan migrate
 ```
 
-### 4. ストレージリンクの作成
+### 4. ストレージリンクの作成（ローカル環境のみ）
+
+ローカル環境で`FILESYSTEM_DISK=public`を使用する場合：
 
 ```bash
 php artisan storage:link
 ```
+
+**注意**: 本番環境でR2を使用する場合は、このコマンドは不要です。
 
 ### 5. 開発サーバーの起動
 
@@ -93,6 +103,54 @@ npm run dev
 ### フロントエンドでの表示
 
 フロントエンド（`/`）では、公開設定が有効な制作実績が自動的に表示されます。
+
+## ストレージ設定
+
+### ローカル環境
+
+ローカル環境では、デフォルトでローカルストレージ（`public` disk）を使用します：
+
+```env
+FILESYSTEM_DISK=public
+```
+
+### 本番環境（Cloudflare R2）
+
+本番環境でCloudflare R2を使用する場合、以下の環境変数を設定してください：
+
+```env
+# ストレージディスクをR2に設定
+FILESYSTEM_DISK=r2
+
+# Cloudflare R2の認証情報
+R2_ACCESS_KEY_ID=your_access_key_id
+R2_SECRET_ACCESS_KEY=your_secret_access_key
+R2_BUCKET=your_bucket_name
+R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+R2_URL=https://<your-custom-domain>.com
+R2_REGION=auto
+R2_USE_PATH_STYLE_ENDPOINT=true
+```
+
+#### R2の設定手順
+
+1. **Cloudflare R2でバケットを作成**
+   - Cloudflareダッシュボードで「R2 Object Storage」を選択
+   - 「Create Bucket」をクリックしてバケットを作成
+
+2. **APIキーを生成**
+   - 「Manage R2 API Tokens」をクリック
+   - 「Create API Token」をクリック
+   - 必要な権限を設定してトークンを作成
+   - `Access Key ID`と`Secret Access Key`をコピー
+
+3. **カスタムドメインを設定（オプション）**
+   - バケットの設定で「Public Access」を有効化
+   - カスタムドメインを設定（`R2_URL`に使用）
+
+4. **環境変数を設定**
+   - Railwayダッシュボードで上記の環境変数を設定
+   - `FILESYSTEM_DISK=r2`を設定することで、自動的にR2が使用されます
 
 ## Railwayへのデプロイ
 

@@ -127,7 +127,7 @@
         @forelse($portfolios as $portfolio)
         <div class="portfolio-item">
           <div class="portfolio-image">
-            <img src="{{ asset('storage/' . $portfolio->image_path) }}" alt="{{ $portfolio->title }}" loading="lazy">
+            <img src="{{ $portfolio->image_url }}" alt="{{ $portfolio->title }}" loading="lazy">
             <div class="portfolio-overlay">
               <div class="portfolio-content">
                 <h3 class="portfolio-title">{{ $portfolio->title }}</h3>

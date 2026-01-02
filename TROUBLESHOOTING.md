@@ -34,7 +34,7 @@
 
 ### データベース接続エラー
 
-#### エラー: `SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo for mysql.railway.internal failed`
+#### エラー1: `SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo for mysql.railway.internal failed`
 
 **原因**:
 - `mysql.railway.internal`はRailwayの内部ネットワークでのみ使用可能
@@ -52,6 +52,43 @@
 **ローカル環境の場合**:
 - Railwayダッシュボードのターミナルからマイグレーションを実行する（推奨）
 - または、ローカル環境の`.env`で公開URL（`metro.proxy.rlwy.net`など）を使用
+
+#### エラー2: `getaddrinfo for ${MYSQLHOST} failed` または `getaddrinfo for ${{MySQL.MYSQLHOST}} failed`
+
+**原因**:
+- 環境変数`DB_HOST`に自動変数参照（`${{MySQL.MYSQLHOST}}`など）が設定されているが、正しく展開されていない
+- 環境変数が文字列としてそのまま使われている
+
+**解決方法**（重要）:
+
+1. **データベースサービス**の「Variables」タブを開く
+2. 以下の値を確認（コピー）：
+   - `MYSQLHOST`（例: `mysql.railway.internal`）
+   - `MYSQLPORT`（例: `3306`）
+   - `MYSQLDATABASE`（例: `railway`）
+   - `MYSQLUSER`（例: `root`）
+   - `MYSQLPASSWORD`（実際のパスワード）
+
+3. **アプリケーションサービス**の「Variables」タブを開く
+
+4. `DB_HOST`を探してクリック（または新規作成）
+
+5. **重要**: 自動変数参照（`${{MySQL.MYSQLHOST}}`）は**使わない**
+   - **Variable**: `DB_HOST`
+   - **Value**: データベースサービスの`MYSQLHOST`の値を**直接入力**（例: `mysql.railway.internal`）
+   - 「Save」をクリック
+
+6. 同様に、他のデータベース接続情報も**直接値**で設定：
+   - `DB_PORT` = `MYSQLPORT`の値（例: `3306`）
+   - `DB_DATABASE` = `MYSQLDATABASE`の値（例: `railway`）
+   - `DB_USERNAME` = `MYSQLUSER`の値（例: `root`）
+   - `DB_PASSWORD` = `MYSQLPASSWORD`の値（実際のパスワード）
+
+7. 環境変数を更新すると、アプリケーションが自動的に再起動されます
+
+**確認方法**:
+- アプリケーションサービスの「Variables」タブで、`DB_HOST`の値が`mysql.railway.internal`のような**実際の値**になっているか確認
+- `${MYSQLHOST}`や`${{MySQL.MYSQLHOST}}`のような**文字列**になっていないか確認
 
 ### マイグレーションが実行できない
 

@@ -34,7 +34,7 @@
             @if($portfolio->image_path)
             <div style="margin-top: 1rem;">
                 <p style="color: rgba(255, 255, 255, 0.5); margin-bottom: 0.5rem;">現在の画像:</p>
-                <img src="{{ asset('storage/' . $portfolio->image_path) }}" alt="{{ $portfolio->title }}" style="max-width: 200px; border-radius: 12px;">
+                <img src="{{ $portfolio->image_url }}" alt="{{ $portfolio->title }}" style="max-width: 200px; border-radius: 12px;">
             </div>
             @endif
         </div>

@@ -14,7 +14,7 @@
         <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1.5rem;">
             @if($portfolio->image_path)
             <div>
-                <img src="{{ asset('storage/' . $portfolio->image_path) }}" alt="{{ $portfolio->title }}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 12px;">
+                <img src="{{ $portfolio->image_url }}" alt="{{ $portfolio->title }}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 12px;">
             </div>
             @endif
             <div>

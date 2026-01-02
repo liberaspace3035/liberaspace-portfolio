@@ -11,3 +11,5 @@ storage/framework/views/*
 bootstrap/cache/*
 database/database.sqlite
 
+
+
