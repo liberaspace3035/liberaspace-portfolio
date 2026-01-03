@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\AdminPortfolioController;
 use App\Http\Controllers\Admin\AdminHeroStatController;
 use App\Http\Controllers\Admin\AdminServiceController;
@@ -13,6 +14,7 @@ Route::get('/health', function () {
 
 // Frontend routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // Admin routes
 Route::prefix('admin')->name('admin.')->middleware(['web'])->group(function () {

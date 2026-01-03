@@ -301,24 +301,38 @@
           </div>
         </div>
         <div class="contact-form-wrapper">
-          <form class="contact-form" id="contactForm">
+          <form class="contact-form" id="contactForm" action="{{ route('contact.store') }}" method="POST">
+            @csrf
+            <div id="contactFormMessage" style="display: none; margin-bottom: 1.5rem; padding: 1rem; border-radius: 12px;"></div>
             <div class="form-group">
               <label for="name">お名前</label>
-              <input type="text" id="name" name="name" required>
+              <input type="text" id="name" name="name" value="{{ old('name') }}" required>
+              @error('name')
+                <span style="color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem;">{{ $message }}</span>
+              @enderror
             </div>
             <div class="form-group">
               <label for="email">メールアドレス</label>
-              <input type="email" id="email" name="email" required>
+              <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+              @error('email')
+                <span style="color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem;">{{ $message }}</span>
+              @enderror
             </div>
             <div class="form-group">
               <label for="subject">件名</label>
-              <input type="text" id="subject" name="subject" required>
+              <input type="text" id="subject" name="subject" value="{{ old('subject') }}" required>
+              @error('subject')
+                <span style="color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem;">{{ $message }}</span>
+              @enderror
             </div>
             <div class="form-group">
               <label for="message">メッセージ</label>
-              <textarea id="message" name="message" rows="6" required></textarea>
+              <textarea id="message" name="message" rows="6" required>{{ old('message') }}</textarea>
+              @error('message')
+                <span style="color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem;">{{ $message }}</span>
+              @enderror
             </div>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" id="submitButton">
               <span>送信する</span>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M2.5 17.5L17.5 2.5M17.5 2.5H7.5M17.5 2.5V12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -326,6 +340,58 @@
             </button>
           </form>
         </div>
+        
+        <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const form = this;
+          const submitButton = document.getElementById('submitButton');
+          const messageDiv = document.getElementById('contactFormMessage');
+          const formData = new FormData(form);
+          
+          // ボタンを無効化
+          submitButton.disabled = true;
+          submitButton.innerHTML = '<span>送信中...</span>';
+          messageDiv.style.display = 'none';
+          
+          try {
+            const response = await fetch(form.action, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+              }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+              messageDiv.style.display = 'block';
+              messageDiv.style.background = 'rgba(34, 197, 94, 0.1)';
+              messageDiv.style.border = '1px solid rgba(34, 197, 94, 0.3)';
+              messageDiv.style.color = '#22c55e';
+              messageDiv.textContent = data.message;
+              form.reset();
+            } else {
+              messageDiv.style.display = 'block';
+              messageDiv.style.background = 'rgba(239, 68, 68, 0.1)';
+              messageDiv.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+              messageDiv.style.color = '#ef4444';
+              messageDiv.textContent = data.message;
+            }
+          } catch (error) {
+            messageDiv.style.display = 'block';
+            messageDiv.style.background = 'rgba(239, 68, 68, 0.1)';
+            messageDiv.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+            messageDiv.style.color = '#ef4444';
+            messageDiv.textContent = 'エラーが発生しました。しばらく時間をおいて再度お試しください。';
+          } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<span>送信する</span><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2.5 17.5L17.5 2.5M17.5 2.5H7.5M17.5 2.5V12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          }
+        });
+        </script>
       </div>
     </div>
   </section>
