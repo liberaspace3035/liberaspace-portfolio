@@ -178,6 +178,19 @@ class AdminPortfolioController extends Controller
 
                 // 使用するディスクの設定を確認
                 $diskConfig = config("filesystems.disks.{$disk}");
+                
+                // バケットが設定されていない場合はエラー
+                if (in_array($disk, ['r2', 's3']) && empty($diskConfig['bucket'])) {
+                    $errorMessage = "R2/S3ディスクの設定が不完全です。バケット名が設定されていません。";
+                    Log::error('R2/S3 configuration error', [
+                        'disk' => $disk,
+                        'bucket' => $diskConfig['bucket'] ?? 'null',
+                        'R2_BUCKET' => env('R2_BUCKET'),
+                        'AWS_BUCKET' => env('AWS_BUCKET'),
+                    ]);
+                    return back()->withErrors(['image' => $errorMessage])->withInput();
+                }
+                
                 Log::info("Disk '{$disk}' Config Check:", [
                     'driver' => $diskConfig['driver'] ?? 'not set',
                     'endpoint' => $diskConfig['endpoint'] ?? 'not set',
@@ -345,6 +358,19 @@ class AdminPortfolioController extends Controller
 
                 // 使用するディスクの設定を確認
                 $diskConfig = config("filesystems.disks.{$disk}");
+                
+                // バケットが設定されていない場合はエラー
+                if (in_array($disk, ['r2', 's3']) && empty($diskConfig['bucket'])) {
+                    $errorMessage = "R2/S3ディスクの設定が不完全です。バケット名が設定されていません。";
+                    Log::error('R2/S3 configuration error - Update', [
+                        'disk' => $disk,
+                        'bucket' => $diskConfig['bucket'] ?? 'null',
+                        'R2_BUCKET' => env('R2_BUCKET'),
+                        'AWS_BUCKET' => env('AWS_BUCKET'),
+                    ]);
+                    return back()->withErrors(['image' => $errorMessage])->withInput();
+                }
+                
                 Log::info("Update - Disk '{$disk}' Config Check:", [
                     'driver' => $diskConfig['driver'] ?? 'not set',
                     'endpoint' => $diskConfig['endpoint'] ?? 'not set',

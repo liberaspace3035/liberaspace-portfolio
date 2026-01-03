@@ -77,6 +77,33 @@
 |--------|-----|------|
 | `ADMIN_PASSWORD` | 任意のパスワード | 管理画面のログインパスワード |
 
+#### メール設定（SendGrid）
+
+本番環境でSendGridを使用してメールを送信する場合：
+
+| 変数名 | 値 | 説明 |
+|--------|-----|------|
+| `MAIL_MAILER` | `sendgrid` | メール送信に使用するメーラー（`sendgrid`または`smtp`） |
+| `MAIL_HOST` | `smtp.sendgrid.net` | SendGridのSMTPホスト |
+| `MAIL_PORT` | `587` | SendGridのSMTPポート（TLS用） |
+| `MAIL_USERNAME` | `apikey` | SendGridのユーザー名（固定値） |
+| `MAIL_PASSWORD` | SendGrid API Key | SendGridで生成したAPI Key |
+| `MAIL_ENCRYPTION` | `tls` | 暗号化方式（TLS推奨） |
+| `MAIL_FROM_ADDRESS` | 送信元メールアドレス | 例: `noreply@liberaspace.net` |
+| `MAIL_FROM_NAME` | 送信者名 | 例: `Liberaspace` |
+
+**SendGrid API Keyの取得方法**:
+1. [SendGrid](https://sendgrid.com/)にログイン
+2. 「Settings」→「API Keys」に移動
+3. 「Create API Key」をクリック
+4. API Key名を入力し、権限を設定（「Full Access」または「Mail Send」）
+5. 生成されたAPI Keyをコピー（一度しか表示されません）
+6. Railwayの環境変数`MAIL_PASSWORD`に設定
+
+**注意**:
+- ローカル環境では`MAIL_MAILER=log`を使用すると、メールはログファイルに記録されます
+- 本番環境では`MAIL_MAILER=sendgrid`（または`smtp`）を設定してください
+
 #### ストレージ設定（Cloudflare R2）
 
 **方法1: `r2`ディスクを使用（推奨）**
