@@ -35,3 +35,4 @@ class ContactConfirmationMail extends Mailable
     }
 }
 
+

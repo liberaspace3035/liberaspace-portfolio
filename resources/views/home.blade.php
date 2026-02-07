@@ -161,7 +161,7 @@
       <div class="about-content">
         <div class="about-text">
           <span class="section-label">会社について</span>
-          <h2 class="section-title">Liberaspaceについて</h2>
+          <h2 class="section-title"><span class="title-company">Liberaspace</span><span class="title-about">について</span></h2>
           <div class="about-description">
             <p>
               Liberaspaceは、静的サイト制作からWEBアプリ開発まで、幅広いWeb制作サービスを提供する会社です。

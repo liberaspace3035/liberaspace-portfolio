@@ -72,3 +72,4 @@ AWS_USE_PATH_STYLE_ENDPOINT=true
 5. エラーメッセージまたは成功メッセージを確認
 6. Railwayのログで詳細を確認
 
+

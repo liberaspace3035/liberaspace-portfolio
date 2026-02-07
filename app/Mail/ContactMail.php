@@ -36,3 +36,4 @@ class ContactMail extends Mailable
     }
 }
 
+

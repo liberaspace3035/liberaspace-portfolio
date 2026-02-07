@@ -690,6 +690,16 @@ section {
   line-height: 1.2;
   margin-bottom: $spacing-md;
   @include gradient-text;
+  white-space: nowrap;
+  
+  @media (max-width: $breakpoint-sm) {
+    white-space: normal;
+  }
+  
+  .title-company,
+  .title-about {
+    display: inline-block;
+  }
 }
 
 .section-description {
