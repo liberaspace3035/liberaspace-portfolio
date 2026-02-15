@@ -693,12 +693,13 @@ section {
   white-space: nowrap;
   
   @media (max-width: $breakpoint-sm) {
-    white-space: normal;
+    white-space: nowrap;
   }
   
   .title-company,
   .title-about {
     display: inline-block;
+    white-space: nowrap;
   }
 }
 
@@ -910,6 +911,11 @@ section {
 
 .about-text {
   max-width: 600px;
+
+  // タイトルがコンテナで見切れないよう、1行のまま収まるフォントサイズに調整
+  .section-title {
+    font-size: clamp(1.25rem, 3.5vw, 1.875rem);
+  }
 }
 
 .about-description {
@@ -1009,8 +1015,18 @@ section {
 }
 
 .value-icon {
-  font-size: $font-size-2xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  color: rgba(255, 255, 255, 0.9);
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 // ============================================
@@ -1033,6 +1049,11 @@ section {
 
 .contact-info {
   max-width: 500px;
+
+  // タイトルがコンテナで見切れないよう、1行のまま収まるフォントサイズに調整
+  .section-title {
+    font-size: clamp(1.25rem, 3.5vw, 1.875rem);
+  }
 }
 
 .contact-description {

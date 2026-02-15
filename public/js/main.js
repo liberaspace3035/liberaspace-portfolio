@@ -329,7 +329,7 @@ function initCursorEffect() {
     border-radius: 50%;
     position: fixed;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 100;
     transition: transform 0.1s ease;
     display: none;
   `;
@@ -344,7 +344,7 @@ function initCursorEffect() {
     border-radius: 50%;
     position: fixed;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 100;
     transition: transform 0.05s ease;
     display: none;
   `;

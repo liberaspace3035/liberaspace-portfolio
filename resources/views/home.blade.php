@@ -205,21 +205,27 @@
               <h3>技術スタック</h3>
               <ul class="values-list">
                 <li>
-                  <span class="value-icon">💻</span>
+                  <span class="value-icon" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  </span>
                   <div>
                     <strong>Laravel / PHP</strong>
                     <p>WEBアプリ開発の基盤</p>
                   </div>
                 </li>
                 <li>
-                  <span class="value-icon">🌐</span>
+                  <span class="value-icon" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  </span>
                   <div>
                     <strong>JavaScript / MySQL</strong>
                     <p>フロントエンドとデータベース</p>
                   </div>
                 </li>
                 <li>
-                  <span class="value-icon">📝</span>
+                  <span class="value-icon" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                  </span>
                   <div>
                     <strong>WordPress / WIX / CMS</strong>
                     <p>CMS活用による効率的な制作</p>
